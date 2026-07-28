@@ -63,9 +63,10 @@ SCRAPE_SITES = ["linkedin", "indeed"]
 SEARCH_TERMS = [
     "software engineer",
     "backend engineer",
-    "full stack developer",
-    "full stack builder",
-    "product engineer",
+    "java backend developer",
+    "java spring boot developer",
+    "azure data engineer",
+    "data engineer",
 ]
 
 TELEGRAM_BOT_TOKEN     = os.getenv("TELEGRAM_BOT_TOKEN", "")
@@ -83,6 +84,8 @@ TELEGRAM_CHAT_ID_LOW   = os.getenv("TELEGRAM_CHAT_ID_LOW", "")
 TITLE_REJECT_KEYWORDS = [
     r"principal\b", r"architect\b", r"manager\b", r"director\b",
     r"staff\b", r"distinguished\b",
+    r"devops\b", r"sre\b", r"site\s+reliability", r"embedded", r"firmware",
+    r"data\s+scientist", r"machine\s+learning",
 ]
 
 # General rejects: reject if found in title OR description (wrong stack, wrong domain, AI, YOE)
@@ -105,11 +108,11 @@ REJECT_KEYWORDS = [
 ]
 
 REQUIRE_ANY_KEYWORDS = [
-    "javascript", "typescript", "node", "react", "vue", "next",
-    "ruby", "rails", "java", "spring",
-    "backend", "full.?stack", "fullstack",
-    "software engineer", "software developer",
-    "rest api", "graphql", "microservice",
+    r"\bjava\b", r"spring\s*boot", r"spring\s+(mvc|data|security|cloud)",
+    r"backend", r"software\s+(engineer|developer)", r"rest\s*api", r"microservices?",
+    r"azure\s+(data\s+factory|sql|data\s+engineer|synapse|databricks)",
+    r"\badf\b", r"data\s+engineer", r"etl\b", r"elt\b", r"data\s+pipeline",
+    r"sql\s*(server)?\b", r"stored\s+procedures?", r"data\s+warehouse",
 ]
 
 
@@ -226,120 +229,69 @@ def rate_limited_analyze(content: str, prompt: str):
 # User Profile  (built from resume-short.txt)
 # ─────────────────────────────────────────────
 USER_PROFILE = {
-    "name": "Chaitanya Gupta",
-    "yoe": "3+ years",
+    "name": "Ashutosh Jha",
+    "yoe": "2+ years",
     "target_roles": [
         "Software Engineer",
-        "Senior Software Engineer",
-        "Full Stack Engineer",
-        "Full Stack Developer",
+        "Java Backend Engineer",
+        "Java Backend Developer",
         "Backend Engineer",
         "Backend Developer",
+        "Azure Data Engineer",
+        "Data Engineer",
     ],
-    "target_yoe_range": "roles requiring 1–5 years of experience (ideally 3–5 YOE)",
+    "target_yoe_range": "roles requiring 1–4 years of experience (especially 2–3 YOE)",
 
     # ── What to INCLUDE ──────────────────────────────────────────────────────
     "preferred_stacks": [
-        "Ruby on Rails",
         "Java / Spring Boot",
-        "JavaScript / TypeScript",
-        "Node.js / Express.js",
-        "React.js / Next.js",
-        "Vue.js / Vue 3",
-        "MERN stack",
-        "GraphQL",
+        "Spring MVC / Spring Data JPA / Spring Security / Spring Cloud",
         "REST APIs",
-        "PostgreSQL",
-        "MongoDB",
-        "Redis",
-        "Kafka",
-        "Microservices",
-        "Docker",
-        "Kubernetes",
-        "AWS",
-        "Azure",
-        "LLM API integration",
+        "Microservices / Netflix Eureka",
+        "SQL / SQL Server / Azure SQL",
+        "MySQL / PostgreSQL / MongoDB",
+        "Stored Procedures / UDFs",
+        "Azure Data Factory (ADF)",
+        "ETL / ELT pipelines / Data warehousing",
+        "Azure Kubernetes Service (AKS)",
+        "Jenkins / Git / Maven / Docker",
     ],
     "open_to_learning": True,
     "note_on_stack": (
-        "Open to roles using any modern backend or full-stack technology, "
-        "not limited to the above. Fast learner — has picked up Vue 3, Kafka, "
-        "Kubernetes, and LLM pipelines on the job."
+        "Prioritise Java backend and Azure data engineering roles. The candidate is "
+        "also a strong fit for general software engineering roles involving Java, SQL, "
+        "microservices, REST APIs, Azure, ETL, or production data reliability."
     ),
 
     "avoid": [
-        "Python-only roles (e.g. Django, Flask, FastAPI full-stack)",
+        "Python-only backend roles with no Java, Azure, SQL, or data-engineering component",
         ".NET / C# roles",
-        "Data Science / ML / AI / GenAI / LLM / Agent roles",
+        "Data Science / ML / AI / GenAI / LLM / Agent roles (data engineering is in scope)",
         "DevOps / SRE-only roles",
         "Embedded / firmware roles",
-        "More than 5 YOE explicitly required",
+        "More than 4 YOE explicitly required",
     ],
 
-    # ── Experience highlights (enriched from resume + self-appraisal) ─────────
+    # Resume-based experience summary used by the job-matching prompt.
     "experience": """
-Current: Senior Software Engineer at Veersa Technologies (Feb 2023 – Present)
-Stack: Ruby on Rails, Vue 3 (TypeScript), PostgreSQL, Redis, Sidekiq, REST APIs
-Domain: US healthcare EMR & Integrated Billing SaaS (KIPU Health)
-Total professional experience: 3+ years (2 years FTE + internships from 2020)
+Software Engineer at Veersa Technologies (Aug 2024 – Present), supporting the
+Legends Global e-commerce data platform for FIFA and Real Madrid storefronts.
+- Owns reliability for 60+ production Azure Data Factory pipelines spanning
+  Shopify, M3 ERP, and third-party logistics integrations.
+- Investigates ETL/order-transmission failures, validates cross-system data
+  integrity with complex SQL, and maintains SQL Server stored procedures and UDFs.
+- Reduced pipeline incident MTTR by 20% through a systematic debugging playbook.
 
-Key achievements & impact:
-- Led Billable Report modernization: migrated a high-traffic legacy DataTables/ERB
-  billing report to Vue 3 with composable architecture, server-side pagination, filtering,
-  sorting, and unlimited streaming exports (previously capped at 3,000 rows). New
-  architecture became the foundation for all subsequent billing report conversions.
-- Architected REGEN billing pipeline refactor: replaced 20+ fragmented Sidekiq workers
-  with a unified patient-centric pipeline, cutting worker executions by 65–75%, eliminating
-  race conditions and long-standing data inconsistencies. Presented at R&D All-Hands;
-  called the most ambitious IB project by the Engineering Manager.
-- Built multi-step Audit Wizard: transformed a fully manual audit process into a guided,
-  automated workflow. Reduced 100-patient validation from 50–100+ minutes to under a
-  minute, directly accelerating client onboardings.
-- Designed Claim History modernization: proposed and built a service-based architecture
-  with a unified diff-snapshot timeline supporting both legacy and new billing workflows.
-  Appreciated for well-thought options and attention to detail.
-- Delivered Insurance Change Management (ICM) ahead of a critical CMS deadline;
-  praised by Product and implementation teams as working "like a charm".
-- Owned patient payments integration via Module Federation — embedded Stripe-powered
-  React components into Vue 3 EMR; resolved a Stripe Connect iframe bug in production.
-  Recognized by the CPTO.
-- Built reusable BAT Vue component library: persistent cross-page selections, auto-save
-  user preferences, redesigned action bars, sidebar modals. Adopted across all billing
-  reports, reducing future development effort and inconsistency.
-- Implemented Mass REGEN workflow for KIPU staff: regenerate billing candidates across
-  entire census with progress tracking, validation safeguards, and real-time status updates.
-- Regularly supported production incidents: root-cause analysis, data corrections, rapid
-  triaging of customer-impacting issues alongside Product and Engineering.
-- Stepped up as dev lead during team absence: ran standups, managed deployments,
-  coordinated with Product. Earned Achievers Award for exceptional contribution.
+Previously a Software Engineer Intern on HealthEdge backend modernisation:
+- Delivered 10+ production Java/Spring Boot REST endpoints and SQL migration
+  scripts across 5+ environments with zero data incidents.
+- Monitored Jenkins CI/CD, automated API validation with Postman, and used Git,
+  Bitbucket, and Jira in an Agile team.
 
-Soft skills demonstrated:
-- End-to-end ownership across architecture, delivery, QA, and production support.
-- Cross-functional collaboration: Product, QA, Implementation, DevOps, and Engineering.
-- Proactively identifies scope beyond assigned tickets; proposes improvements.
-- Documented RCA findings, reusable scripts, and implementation walkthroughs in
-  Jira/Confluence for team knowledge sharing.
-- Demonstrated architectural thinking: evaluated multiple approaches, discussed
-  trade-offs, iterated on design before implementation.
-
-AI & continuous learning:
-- Built AI-integrated personal projects including DSA Pattern Lab (context-aware AI
-  tutor, mock interview mode, multi-provider LLM factory) and an AI-powered market
-  research application (web scraping + LLM analysis pipeline).
-- Actively learning RAG, LLM workflows, prompt engineering, and AI-assisted development.
-- Uses Cursor for day-to-day development; integrates AI tooling into workflow.
-
-Earlier: Full Stack Developer Intern at MarketInc (2022), MyWays (2020)
-  MERN stack, REST APIs, ERP dashboards, notification infrastructure, ML analytics APIs.
-
-Personal projects (portfolio: https://chaitanyagupta.netlify.app/):
-- Amazon Clone: Polyglot microservices (Node.js/MongoDB, Java/Spring Boot/PostgreSQL,
-  Go/Redis, Next.js), Kafka, Kubernetes, Docker, Stripe. Published shared NPM package.
-- DSA Pattern Lab: Vue 3, TypeScript, Python data pipeline, Gemini/Groq/Ollama LLM
-  factory, AI tutor, spaced repetition, mock interviews.
-- Alpha Blog: Ruby on Rails 6, React, PostgreSQL, RSpec, Action Cable (real-time chat).
-- Crowdy dApp: React, Solidity, Web3 — blockchain-powered crowdfunding.
-- DoctorzBook: React, Node, Express, MongoDB — real-time appointment booking.
+Backend project work: Spring Boot microservices with Spring Cloud, Netflix Eureka,
+Spring Data JPA, MySQL, MongoDB, Spring Security, JUnit, Mockito, and Docker.
+Data project work: Python, SQL, Azure Data Factory, REST APIs, ETL, validation
+checks, and aggregation stored procedures.
 """,
 
     # ── Location & logistics ─────────────────────────────────────────────────
@@ -569,16 +521,23 @@ Experience Summary:
 {USER_PROFILE['experience']}
 
 Scoring Rules:
-- Score 8–10: Strong alignment on tech stack, YOE range, and role type. Apply immediately.
-- Score 6–7: Decent match, some gaps but learnable. Worth considering.
-- Score 1–5: Poor fit — wrong stack, too senior/junior, domain mismatch.
-- Score 0: Explicitly in the avoid list (e.g. Python-only, .NET, DevOps-only, Data Science).
+- Score 8–10: Strong fit for Java backend, software engineering, or Azure data engineering;
+  strong alignment on relevant skills and 1–4 YOE. Apply immediately.
+- Score 6–7: Related backend, software engineering, cloud-data, or SQL/ETL role with
+  some learnable gaps. Worth considering.
+- Score 1–5: Poor fit because it is the wrong stack, excessively senior, or outside the
+  candidate's backend/data-engineering focus.
+- Score 0: Explicitly in the avoid list (for example .NET, DevOps-only, or Data Science).
 
-Ruby on Rails (RoR) Bias (CRITICAL):
-- Ruby on Rails is the candidate's primary and working experience for the past 3 years.
-- There are fewer RoR opportunities, so they are extremely important to the candidate.
-- You MUST apply a strong positive bias to any role that mentions or requires Ruby on Rails.
-- If the role lists Ruby on Rails or Ruby as a key skill/technology, automatically score it 8 or higher (unless it is a senior role requiring >5 YOE, or is explicitly in the avoid list), and explain this core expertise match in "why_it_fits".
+Priority-fit guidance (CRITICAL):
+- Give strong positive weight to Java, Spring Boot, REST APIs, microservices, SQL,
+  Azure Data Factory, Azure SQL, ETL/ELT, stored procedures, UDFs, and data pipelines.
+- Treat Azure data engineering as a primary target, not as Data Science or ML.
+- A role that combines Java/Spring Boot and Azure/SQL, or ADF/ETL/SQL, is normally an
+  8+ match when its stated experience requirement is within range.
+- Do not down-rank a relevant role merely because it mentions CI/CD, Docker, AKS, or
+  Python as a supporting tool; do down-rank jobs that are fundamentally DevOps/SRE-only
+  or Python-only web-backend roles.
 
 Additionally, provide a brief company overview and estimated salary range for this role.
 For salary: use any known data about this company's pay bands for similar roles in India.
@@ -831,20 +790,25 @@ def main() -> None:
             provider = provider_or_reason
             score = analysis.get("fit_score", 0)
 
-            # Check if the role is a Ruby on Rails role and apply bias boost
+            # Apply a deterministic boost for the candidate's core target stacks.
             desc_lower = desc.lower()
             title_lower = title.lower()
-            has_ruby = bool(re.search(r"\bruby\b", desc_lower) or re.search(r"\bruby\b", title_lower))
-            has_rails = bool(re.search(r"\brails\b", desc_lower) or re.search(r"\brails\b", title_lower))
-            has_ror = bool(re.search(r"\bror\b", desc_lower) or re.search(r"\bror\b", title_lower))
-            has_ruby_on_rails = bool(re.search(r"\bruby\s+on\s+rails\b", desc_lower) or re.search(r"\bruby\s+on\s+rails\b", title_lower))
-            is_ror = has_ruby or has_rails or has_ror or has_ruby_on_rails
+            job_text = f"{title_lower} {desc_lower}"
+            has_java_backend = bool(
+                re.search(r"\bjava\b", job_text)
+                and re.search(r"spring\s*boot|backend|rest\s*api|microservices?", job_text)
+            )
+            has_azure_data = bool(
+                re.search(r"azure\s+data\s+factory|\badf\b|azure\s+data\s+engineer", job_text)
+                and re.search(r"\betl\b|\belt\b|\bsql\b|data\s+pipeline|data\s+warehouse", job_text)
+            )
 
-            if is_ror and 0 < score < 8:
-                logger.info(f"  ↳ Python-side RoR boost: raising score from {score} to 8")
+            if (has_java_backend or has_azure_data) and 0 < score < 8:
+                match_type = "Java backend" if has_java_backend else "Azure data engineering"
+                logger.info(f"  ↳ Python-side {match_type} boost: raising score from {score} to 8")
                 score = 8
                 analysis["fit_score"] = 8
-                analysis["why_it_fits"] = f"[RoR Boost Applied] {analysis.get('why_it_fits', '')}"
+                analysis["why_it_fits"] = f"[{match_type} boost applied] {analysis.get('why_it_fits', '')}"
 
             save_job(conn, url, title, company, score, provider)
 
