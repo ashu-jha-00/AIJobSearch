@@ -62,11 +62,9 @@ SCRAPE_SITES = ["linkedin", "indeed"]
 # Deduplication by URL ensures the same posting isn't analysed twice
 SEARCH_TERMS = [
     "software engineer",
-    "backend engineer",
-    "java backend developer",
-    "java spring boot developer",
-    "azure data engineer",
+    "java developer",
     "data engineer",
+    "azure",
 ]
 
 TELEGRAM_BOT_TOKEN     = os.getenv("TELEGRAM_BOT_TOKEN", "")
@@ -245,16 +243,10 @@ USER_PROFILE = {
     # ── What to INCLUDE ──────────────────────────────────────────────────────
     "preferred_stacks": [
         "Java / Spring Boot",
-        "Spring MVC / Spring Data JPA / Spring Security / Spring Cloud",
         "REST APIs",
-        "Microservices / Netflix Eureka",
-        "SQL / SQL Server / Azure SQL",
-        "MySQL / PostgreSQL / MongoDB",
-        "Stored Procedures / UDFs",
+        "Microservices",
         "Azure Data Factory (ADF)",
         "ETL / ELT pipelines / Data warehousing",
-        "Azure Kubernetes Service (AKS)",
-        "Jenkins / Git / Maven / Docker",
     ],
     "open_to_learning": True,
     "note_on_stack": (
@@ -269,38 +261,13 @@ USER_PROFILE = {
         "Data Science / ML / AI / GenAI / LLM / Agent roles (data engineering is in scope)",
         "DevOps / SRE-only roles",
         "Embedded / firmware roles",
-        "More than 4 YOE explicitly required",
+        "More than 4 Years of experience required",
     ],
-
-    # Resume-based experience summary used by the job-matching prompt.
-    "experience": """
-Software Engineer at Veersa Technologies (Aug 2024 – Present), supporting the
-Legends Global e-commerce data platform for FIFA and Real Madrid storefronts.
-- Owns reliability for 60+ production Azure Data Factory pipelines spanning
-  Shopify, M3 ERP, and third-party logistics integrations.
-- Investigates ETL/order-transmission failures, validates cross-system data
-  integrity with complex SQL, and maintains SQL Server stored procedures and UDFs.
-- Reduced pipeline incident MTTR by 20% through a systematic debugging playbook.
-
-Previously a Software Engineer Intern on HealthEdge backend modernisation:
-- Delivered 10+ production Java/Spring Boot REST endpoints and SQL migration
-  scripts across 5+ environments with zero data incidents.
-- Monitored Jenkins CI/CD, automated API validation with Postman, and used Git,
-  Bitbucket, and Jira in an Agile team.
-
-Backend project work: Spring Boot microservices with Spring Cloud, Netflix Eureka,
-Spring Data JPA, MySQL, MongoDB, Spring Security, JUnit, Mockito, and Docker.
-Data project work: Python, SQL, Azure Data Factory, REST APIs, ETL, validation
-checks, and aggregation stored procedures.
-""",
+    
 
     # ── Location & logistics ─────────────────────────────────────────────────
     "location_preferences": [
-        "Remote — India or US",
-        "Hybrid — Noida / Delhi NCR",
-        "Hybrid — Bengaluru (open to relocation)",
-        "In-office — Noida / Delhi NCR",
-        "In-office — Bengaluru (open to relocation)",
+        "Gurugram","Noida"
     ],
     "location_note": (
         "Do NOT penalise roles for being remote-US, hybrid, or in-office. "
@@ -308,7 +275,7 @@ checks, and aggregation stored procedures.
         "if the role explicitly requires being physically present outside India "
         "(e.g. on-site US/UK only with no remote option)."
     ),
-    "target_salary_range": "20–30 LPA",
+    "target_salary_range": "10–20 LPA",
 
     # ── Dream companies (high priority if matching) ──────────────────────────
     "dream_companies": [
