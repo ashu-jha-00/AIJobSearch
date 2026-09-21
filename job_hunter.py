@@ -86,23 +86,48 @@ TITLE_REJECT_KEYWORDS = [
     r"data\s+scientist", r"machine\s+learning",
 ]
 
-# General rejects: reject if found in title OR description (wrong stack, wrong domain, AI, YOE)
+# A minimum experience requirement of 4 or more years is too senior
+HIGH_YOE = r"(?:[4-9]|[1-9]\d)"
+
+# General rejects: reject if found in title OR description
 REJECT_KEYWORDS = [
     # Wrong stack
-    r"\.net\b", r"\bc#\b", r"\bcsharp\b", r"\basp\.net\b", r"\bdjango\b", r"\bflask\b",
-    r"\bfastapi\b", r"\blaravel\b", r"\bphp\b",
+    r"\.net\b", r"\bc#\b", r"\bcsharp\b", r"\basp\.net\b",
+    r"\bdjango\b", r"\bflask\b", r"\bfastapi\b",
+    r"\blaravel\b", r"\bphp\b",
+
     # Wrong domain / mobile
-    r"\bdevops\b", r"\bsre\b", r"site\s+reliability", r"infrastructure\b", r"platform\s+engineer",
+    r"\bdevops\b", r"\bsre\b", r"site\s+reliability",
+    r"infrastructure\b", r"platform\s+engineer",
     r"embedded", r"firmware",
-    r"android\b", r"ios\b", r"mobile\b", r"flutter\b", r"react\s+native\b",
-    # AI / ML / Data Science (AI Roles)
-    r"\bai\b", r"\bgen.?ai\b", r"generative\s+ai", r"artificial\s+intelligence",
-    r"\bllm\b", r"agent\s+systems?", r"\bml\b", r"machine\s+learning",
-    r"deep\s+learning", r"\bnlp\b", r"computer\s+vision",
+    r"android\b", r"ios\b", r"mobile\b",
+    r"flutter\b", r"react\s+native\b",
+
+    # AI / ML / Data Science
+    r"\bai\b", r"\bgen.?ai\b", r"generative\s+ai",
+    r"artificial\s+intelligence",
+    r"\bllm\b", r"agent\s+systems?", r"\bml\b",
+    r"machine\s+learning", r"deep\s+learning",
+    r"\bnlp\b", r"computer\s+vision",
     r"data\s+scientist", r"data\s+science",
-    # Too senior YOE
-    r"8\+\s*years?", r"10\+\s*years?", r"12\+\s*years?", r"15\+\s*years?",
-    r"8\+\s*yoe\b", r"10\+\s*yoe\b", r"12\+\s*yoe\b", r"15\+\s*yoe\b",
+
+    # Too senior: 4+ years, 5+ yrs, 10+ YOE
+    rf"\b{HIGH_YOE}\s*\+\s*(?:years?|yrs?|yoe)\b",
+
+    # Too senior ranges: 4-6, 5–8, 4 to 7 years
+    rf"\b{HIGH_YOE}\s*(?:-|–|—|to)\s*\d{{1,2}}"
+    rf"\s*(?:years?|yrs?|yoe)\b",
+
+    # Minimum 4 years / at least 5 years
+    rf"\b(?:minimum|min\.?|at\s+least)\s*(?:of\s+)?{HIGH_YOE}"
+    rf"\s*\+?\s*(?:years?|yrs?)\b",
+
+    # 4 or more years
+    rf"\b{HIGH_YOE}\s+or\s+more\s+(?:years?|yrs?)\b",
+
+    # Experience: 4 years / required experience: 5 years
+    rf"\b(?:required\s+)?experience\s*:?\s*{HIGH_YOE}"
+    rf"\s*\+?\s*(?:years?|yrs?)\b",
 ]
 
 REQUIRE_ANY_KEYWORDS = [
@@ -238,8 +263,10 @@ USER_PROFILE = {
         "Azure Data Engineer",
         "Data Engineer",
     ],
-    "target_yoe_range": "roles requiring 1–4 years of experience (especially 2–3 YOE)",
-
+ "target_yoe_range": (
+    "roles whose minimum required experience is 0–3 years; "
+    "ranges such as 2–5 years are acceptable"
+),
     # ── What to INCLUDE ──────────────────────────────────────────────────────
     "preferred_stacks": [
         "Java / Spring Boot",
@@ -773,7 +800,7 @@ def main() -> None:
                 and re.search(r"\betl\b|\belt\b|\bsql\b|data\s+pipeline|data\s+warehouse", job_text)
             )
 
-            if (has_java_backend or has_azure_data) and 0 < score < 8:
+           if (has_java_backend or has_azure_data) and 6 <= score < 8:
                 match_type = "Java backend" if has_java_backend else "Azure data engineering"
                 logger.info(f"  ↳ Python-side {match_type} boost: raising score from {score} to 8")
                 score = 8
