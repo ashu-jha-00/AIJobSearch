@@ -269,6 +269,9 @@ USER_PROFILE = {
     "location_preferences": [
         "Gurugram","Noida"
     ],
+    "experience": (
+    "2+ years of experience in Java backend development and Azure data engineering."
+    ),
     "location_note": (
         "Do NOT penalise roles for being remote-US, hybrid, or in-office. "
         "The candidate is open to all of these. Only flag location as a concern "
