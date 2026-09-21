@@ -743,11 +743,14 @@ def main() -> None:
     seen_title_company: set[str] = set()
 
     for _, row in jobs_df.iterrows():
+        title = "Unknown"
+        company = "Unknown"
+
         try:
-            url     = str(row.get("job_url", "")).strip()
-            title   = str(row.get("title", "Unknown")).strip()
+            url = str(row.get("job_url", "")).strip()
+            title = str(row.get("title", "Unknown")).strip()
             company = str(row.get("company", "Unknown")).strip()
-            desc    = str(row.get("description", "")).strip()
+            desc = str(row.get("description", "")).strip()
 
             if not url:
                 continue
@@ -757,70 +760,136 @@ def main() -> None:
                 processed_count += 1
                 continue
 
-            # Secondary dedup: same title+company already seen this run
+            # Secondary dedup: same title and company seen during this run.
             tc_key = f"{title.lower()}||{company.lower()}"
+
             if tc_key in seen_title_company:
                 skipped_dupe_count += 1
-                logger.info(f"  ↳ Duplicate in-run ({title} @ {company}) — skipped | url: {url}")
+                logger.info(
+                    f"  ↳ Duplicate in-run ({title} @ {company}) "
+                    f"— skipped | url: {url}"
+                )
                 continue
+
             seen_title_company.add(tc_key)
 
-            # Historical title+company check
+            # Historical title and company check.
             if is_title_company_processed(conn, title, company):
                 skipped_dupe_count += 1
-                logger.info(f"  ↳ Duplicate historical ({title} @ {company}) — skipped | url: {url}")
+                logger.info(
+                    f"  ↳ Duplicate historical ({title} @ {company}) "
+                    f"— skipped | url: {url}"
+                )
                 continue
 
             new_count += 1
-            logger.info(f"Analysing: {title} @ {company} | url: {url}")
+            logger.info(
+                f"Analysing: {title} @ {company} | url: {url}"
+            )
 
-            result = analyze_job(title, company, desc)
-            analysis, provider_or_reason = result
+            analysis, provider_or_reason = analyze_job(
+                title,
+                company,
+                desc,
+            )
+
             if analysis is None:
                 if "pre-filter:" in provider_or_reason:
                     pre_filter_reject_count += 1
                 elif provider_or_reason != "too_short":
                     llm_failed_count += 1
+
                 continue
 
             llm_success_count += 1
             provider = provider_or_reason
             score = analysis.get("fit_score", 0)
 
-            # Apply a deterministic boost for the candidate's core target stacks.
+            # Detect the candidate's core target stacks.
             desc_lower = desc.lower()
             title_lower = title.lower()
             job_text = f"{title_lower} {desc_lower}"
+
             has_java_backend = bool(
                 re.search(r"\bjava\b", job_text)
-                and re.search(r"spring\s*boot|backend|rest\s*api|microservices?", job_text)
-            )
-            has_azure_data = bool(
-                re.search(r"azure\s+data\s+factory|\badf\b|azure\s+data\s+engineer", job_text)
-                and re.search(r"\betl\b|\belt\b|\bsql\b|data\s+pipeline|data\s+warehouse", job_text)
+                and re.search(
+                    r"spring\s*boot|backend|rest\s*api|microservices?",
+                    job_text,
+                )
             )
 
-           if (has_java_backend or has_azure_data) and 6 <= score < 8:
-                match_type = "Java backend" if has_java_backend else "Azure data engineering"
-                logger.info(f"  ↳ Python-side {match_type} boost: raising score from {score} to 8")
+            has_azure_data = bool(
+                re.search(
+                    r"azure\s+data\s+factory|\badf\b|"
+                    r"azure\s+data\s+engineer",
+                    job_text,
+                )
+                and re.search(
+                    r"\betl\b|\belt\b|\bsql\b|data\s+pipeline|"
+                    r"data\s+warehouse",
+                    job_text,
+                )
+            )
+
+            # Only boost an already-relevant score of 6 or 7.
+            if (
+                has_java_backend or has_azure_data
+            ) and 6 <= score < 8:
+                match_type = (
+                    "Java backend"
+                    if has_java_backend
+                    else "Azure data engineering"
+                )
+
+                logger.info(
+                    f"  ↳ Python-side {match_type} boost: "
+                    f"raising score from {score} to 8"
+                )
+
                 score = 8
                 analysis["fit_score"] = 8
-                analysis["why_it_fits"] = f"[{match_type} boost applied] {analysis.get('why_it_fits', '')}"
+                analysis["why_it_fits"] = (
+                    f"[{match_type} boost applied] "
+                    f"{analysis.get('why_it_fits', '')}"
+                )
 
-            save_job(conn, url, title, company, score, provider)
+            save_job(
+                conn,
+                url,
+                title,
+                company,
+                score,
+                provider,
+            )
 
             if score >= FIT_THRESHOLD:
                 notified_count += 1
+
                 if score >= 8:
                     high_priority_count += 1
                 else:
                     regular_priority_count += 1
-                send_telegram(title, company, url, analysis, provider)
+
+                send_telegram(
+                    title,
+                    company,
+                    url,
+                    analysis,
+                    provider,
+                )
             else:
                 below_threshold_count += 1
-                logger.info(f"  ↳ Score {score}/10 — below threshold, skipped notify")
+                logger.info(
+                    f"  ↳ Score {score}/10 — "
+                    f"below threshold, skipped notify"
+                )
+
         except Exception as e:
-            logger.error(f"❌ Error processing job '{title}' @ '{company}': {e}", exc_info=True)
+            logger.error(
+                f"❌ Error processing job "
+                f"'{title}' @ '{company}': {e}",
+                exc_info=True,
+            )
             continue
 
     conn.close()
